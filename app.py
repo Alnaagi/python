@@ -26,7 +26,7 @@ def scrape_bid_cars(search_query):
         print("Initializing the WebDriver...")
         options = webdriver.ChromeOptions()
         # Uncomment to run without opening browser:
-        # options.add_argument("--headless")  
+        options.add_argument("--headless")  
         driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
         print("WebDriver initialized.")
 
