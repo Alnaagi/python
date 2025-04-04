@@ -25,7 +25,7 @@ with app.app_context():
 @app.route('/')
 def index():
     cars = Car.query.all()  # Fetch all cars from the database
-    return render_template('table.html', cars=cars)
+    return render_template('index.html', cars=cars)
 
 @app.route('/scrape')
 def scrape():
