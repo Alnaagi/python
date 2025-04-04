@@ -7,7 +7,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 import time
 
 # Initialize Flask app and database connection
-app = Flask(__name__)
+app = Flask(__name__, template_folder='templates')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///car_auction.db'  # Database URI
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
