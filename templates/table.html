@@ -326,6 +326,9 @@
         <option value="price_desc">Price (High to Low)</option>
         <option value="year_asc">Year (Low to High)</option>
         <option value="year_desc">Year (High to Low)</option>
+        <option value="milage_asc">Mileage (Low to High)</option>
+        <option value="milage_desc">Mileage (High to Low)</option>
+
     </select>
 </div>
 </div>
@@ -346,6 +349,9 @@
         <tr>
             <th>Car Title</th>
             <th>Final Bid</th>
+            <th>Milage</th>
+            <th>Damage</th>
+            
         </tr>
     </thead>
     <tbody>
@@ -354,11 +360,15 @@
                 <tr>
                     <td>{{ car.title }}</td>
                     <td>{{ car.final_bid }}</td>
+                    <td>{{ car.car_milage }}</td>
+                    <td>{{ car.car_damage }}</td>
+                  
+                    
                 </tr>
             {% endfor %}
         {% else %}
             <tr>
-                <td colspan="2">No cars found</td>
+                <td colspan="4">No cars found</td>
             </tr>
         {% endif %}
     </tbody>
@@ -430,6 +440,9 @@ function filterTable() {
 }
 
 
+
+
+
     // Function to calculate the min, max, and average prices of all bids
     function calculatePriceMetrics() {
         var table = document.getElementById("carTable");
@@ -474,41 +487,52 @@ function filterTable() {
         document.getElementById("maxPrice").textContent = "Max Final Bid: " + maxDisplay;
     }
 
-    // Function to sort the table by selected option (Price or Year)
-    function sortTable() {
-    var sortBy = document.getElementById("sortByDropdown").value;
-    var table = document.getElementById("carTable");
-    var rows = Array.from(table.rows).slice(1);  // Get all rows except the header
+     // Function to sort the table by selected option (Price, Year, or Milage)
+     function sortTable() {
+        var sortBy = document.getElementById("sortByDropdown").value;
+        var table = document.getElementById("carTable");
+        var rows = Array.from(table.rows).slice(1);
 
-    if (sortBy === "price_asc" || sortBy === "price_desc") {
-        rows.sort(function(a, b) {
-            let priceA = parseFloat(a.cells[1].textContent.replace(/[^\d.-]/g, '').trim());
-            let priceB = parseFloat(b.cells[1].textContent.replace(/[^\d.-]/g, '').trim());
+        if (sortBy === "price_asc" || sortBy === "price_desc") {
+            rows.sort(function(a, b) {
+                let priceA = parseFloat(a.cells[1].textContent.replace(/[^\d.-]/g, '').trim());
+                let priceB = parseFloat(b.cells[1].textContent.replace(/[^\d.-]/g, '').trim());
+                if (isNaN(priceA)) priceA = sortBy === "price_asc" ? Infinity : -Infinity;
+                if (isNaN(priceB)) priceB = sortBy === "price_asc" ? Infinity : -Infinity;
+                return sortBy === "price_asc" ? priceA - priceB : priceB - priceA;
+            });
+        } else if (sortBy === "year_asc" || sortBy === "year_desc") {
+            rows.sort(function(a, b) {
+                var yearA = a.cells[0].textContent.match(/\d{4}/);
+                var yearB = b.cells[0].textContent.match(/\d{4}/);
+                yearA = yearA ? parseInt(yearA[0]) : 0;
+                yearB = yearB ? parseInt(yearB[0]) : 0;
+                return sortBy === "year_asc" ? yearA - yearB : yearB - yearA;
+            });
+        } else if (sortBy === "milage_asc" || sortBy === "milage_desc") {
+            rows.sort(function(a, b) {
+                let milageA = extractMileage(a.cells[2].textContent);
+                let milageB = extractMileage(b.cells[2].textContent);
+                return sortBy === "milage_asc" ? milageA - milageB : milageB - milageA;
+            });
+        }
 
-            // Treat NaN as very large (in asc) or very small (in desc) to push them to the bottom
-            if (isNaN(priceA)) priceA = sortBy === "price_asc" ? Infinity : -Infinity;
-            if (isNaN(priceB)) priceB = sortBy === "price_asc" ? Infinity : -Infinity;
-
-            return sortBy === "price_asc" ? priceA - priceB : priceB - priceA;
+        // Re-append sorted rows
+        rows.forEach(function(row) {
+            table.appendChild(row);
         });
-    } else if (sortBy === "year_asc" || sortBy === "year_desc") {
-        rows.sort(function(a, b) {
-            var yearA = a.cells[0].textContent.match(/\d{4}/);
-            var yearB = b.cells[0].textContent.match(/\d{4}/);
-            yearA = yearA ? parseInt(yearA[0]) : 0;
-            yearB = yearB ? parseInt(yearB[0]) : 0;
-
-            return sortBy === "year_asc" ? yearA - yearB : yearB - yearA;
-        });
+        calculatePriceMetrics();
     }
 
-    // Append sorted rows back into the table
-    rows.forEach(function(row) {
-        table.appendChild(row);
-    });
-
-    calculatePriceMetrics();
-}
+    // Helper function to extract mileage from a string like "154k miles (249k km)"
+    function extractMileage(text) {
+        var match = text.match(/([\d.,]+)k/i);
+        if (match) {
+            return parseFloat(match[1].replace(/,/g, '')) * 1000;
+        } else {
+            return parseFloat(text.replace(/[^\d.]/g, '')) || 0;
+        }
+    }
 
 </script>
 
