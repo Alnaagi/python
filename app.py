@@ -4,8 +4,6 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
 import time
 
 # Flask + DB setup
@@ -28,18 +26,13 @@ with app.app_context():
 def scrape_bid_cars(search_query):
     try:
         print("Initializing the WebDriver...")
-        # options = webdriver.ChromeOptions()
-        options = Options()
-        # Run in headless mode for Render
-        options.binary_location = "/usr/bin/chromium-browser"
-        options.add_argument("--headless")
+        options = webdriver.ChromeOptions()
+        # Run in headless mode for Render's environment
+        # options.add_argument("--headless")
         options.add_argument("--disable-gpu")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
-        # Set the Chromium binary location
         
-        
-        # Initialize the WebDriver with updated options
         driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
         print("WebDriver initialized.")
 
@@ -56,6 +49,7 @@ def scrape_bid_cars(search_query):
 
         for i in range(len(car_titles)):
             title = car_titles[i].text
+            
             try:
                 car_milage = milage[i].text.strip().split(':')[-1].strip()
                 final_bid = bid_prices[i].text.strip().split(':')[-1].strip()
@@ -79,6 +73,7 @@ def scrape_bid_cars(search_query):
     finally:
         driver.quit()
         print("WebDriver closed.")
+
 
 @app.route('/')
 def index():
