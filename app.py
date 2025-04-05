@@ -4,6 +4,8 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 import time
 
 # Flask + DB setup
@@ -26,14 +28,16 @@ with app.app_context():
 def scrape_bid_cars(search_query):
     try:
         print("Initializing the WebDriver...")
-        options = webdriver.ChromeOptions()
+        # options = webdriver.ChromeOptions()
+        options = Options()
         # Run in headless mode for Render
+        options.binary_location = "/usr/bin/chromium-browser"
         options.add_argument("--headless")
         options.add_argument("--disable-gpu")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
         # Set the Chromium binary location
-        options.binary_location = "/usr/bin/chromium-browser"
+        
         
         # Initialize the WebDriver with updated options
         driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
