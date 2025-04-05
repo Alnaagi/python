@@ -3,3 +3,5 @@ gunicorn==20.1.0
 Flask-SQLAlchemy
 selenium
 webdriver_manager
+chromium-browser
+chromium-chromedriver
